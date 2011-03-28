@@ -1,0 +1,1 @@
+This is ZlibFromScratch version 1.0.
