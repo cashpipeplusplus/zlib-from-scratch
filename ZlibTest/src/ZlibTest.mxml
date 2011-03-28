@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   This file is a part of ZlibFromScratch,
+   an open-source ActionScript decompression library.
+   Copyright (C) 2011 - Joey Parrish
+   
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+   
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+   
+   You should have received a copy of the GNU Lesser General Public
+   License along with this library.
+   If not, see <http://www.gnu.org/licenses/>.
+-->
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   applicationComplete="onApplicationComplete();">
+	<fx:Script>
+		<![CDATA[
+			import com.zlibfromscratch.ZlibDecoder;
+			import com.zlibfromscratch.ZlibDecoderError;
+			import com.zlibfromscratch.ZlibUtil;
+			
+			import mx.controls.Button;
+			import mx.utils.UIDUtil;
+			
+			[Embed(source='/assets/stuck.zlib', mimeType="application/octet-stream")]
+			private var stuck:Class;
+			
+			[Embed(source='/assets/level0.zlib', mimeType="application/octet-stream")]
+			private var level0:Class;
+			
+			[Embed(source='/assets/level9.zlib', mimeType="application/octet-stream")]
+			private var level9:Class;
+			
+			[Embed(source='/assets/fixed9.zlib', mimeType="application/octet-stream")]
+			private var fixed9:Class;
+			
+			[Embed(source='/assets/anonymous.gz', mimeType="application/octet-stream")]
+			private var anonymous:Class;
+			
+			[Embed(source='/assets/withname.gz', mimeType="application/octet-stream")]
+			private var withname:Class;
+			
+			private function load(which:Class):ByteArray
+			{
+				return new which() as ByteArray;
+			}
+			
+			private function random():ByteArray
+			{
+				var ba:ByteArray = new ByteArray;
+				for (var i:int = 0; i < 1000; i++) {
+					ba.writeUTF(UIDUtil.createUID());
+					ba.writeByte(Math.floor(Math.random() * 255));
+				}
+				ba.compress();
+				return ba;
+			}
+			
+			private function test(full:ByteArray, verifyChecksum:Boolean):void
+			{
+				trace("compressed size " + full.length);
+				
+				var garbage:String = "Some extra garbage data.";
+				full.position = full.length;
+				full.writeUTFBytes(garbage);
+				
+				var input1:ByteArray = new ByteArray;
+				var input2:ByteArray = new ByteArray;
+				input1.writeBytes(full, 0, full.length / 2);
+				input2.writeBytes(full, input1.length);
+				
+				var z:ZlibDecoder = new ZlibDecoder(verifyChecksum);
+				var output:ByteArray = new ByteArray;
+				var read:uint;
+				
+				var start:Number = new Date().time;
+				read = z.feed(input1, output);
+				input1 = ZlibUtil.removeBeginning(input1, read);
+				if (z.lastError == ZlibDecoderError.NeedMoreData) {
+					if (input1.length) {
+						trace("Not all data consumed from the first input buffer.");
+					} else {
+						trace("Feeding in second half.");
+						read = z.feed(input2, output);
+						input2 = ZlibUtil.removeBeginning(input2, read);
+					}
+				}
+				var end:Number = new Date().time;
+				
+				if (z.lastError != ZlibDecoderError.NoError) {
+					trace("Failed to decode: " + z.lastError);
+				} else {
+					trace("Decode okay.");
+				}
+				trace("output size " + output.length);
+				trace("leftover size " + (input1.length + input2.length));
+				trace("garbage size " + garbage.length);
+				trace("decode time: " + (end - start).toFixed() + " ms.");
+				
+				z.dispose();
+				input1.clear();
+				input2.clear();
+				full.clear();
+				
+				if (1) {
+					output.clear();
+				} else {
+					function onClick(e:MouseEvent):void
+					{
+						var fr:FileReference = new FileReference;
+						fr.save(output);
+					}
+					var b:Button = new Button();
+					b.addEventListener(MouseEvent.CLICK, onClick);
+					addElement(b);
+				}
+			}
+			
+			private function onApplicationComplete():void
+			{
+				var verifyChecksum:Boolean = true;
+				trace("===");
+				trace("Aesop, level 0");
+				test(load(level0), verifyChecksum);
+				trace("===");
+				trace("Aesop, level 9");
+				test(load(level9), verifyChecksum);
+				trace("===");
+				trace("Random data, compressed in Flash");
+				test(random(), verifyChecksum);
+				trace("===");
+				trace("Aesop, fixed level 9");
+				test(load(fixed9), verifyChecksum);
+				trace("===");
+				trace("Aesop, gzip anonymous");
+				test(load(anonymous), verifyChecksum);
+				trace("===");
+				trace("Aesop, gzip with name");
+				test(load(withname), verifyChecksum);
+				trace("===");
+				trace("Regression test: rencode data");
+				test(load(stuck), verifyChecksum);
+				trace("===");
+			}
+		]]>
+	</fx:Script>
+</s:Application>

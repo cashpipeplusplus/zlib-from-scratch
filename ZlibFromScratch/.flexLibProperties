@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
+  <includeClasses>
+    <classEntry path="com.zlibfromscratch.internal.Adler32"/>
+    <classEntry path="com.zlibfromscratch.internal.CRC32"/>
+    <classEntry path="com.zlibfromscratch.internal.DisposeUtil"/>
+    <classEntry path="com.zlibfromscratch.internal.HuffmanDecoder"/>
+    <classEntry path="com.zlibfromscratch.internal.IChecksum"/>
+    <classEntry path="com.zlibfromscratch.ZlibDecoder"/>
+    <classEntry path="com.zlibfromscratch.ZlibDecoderError"/>
+    <classEntry path="com.zlibfromscratch.ZlibUtil"/>
+  </includeClasses>
+  <includeResources/>
+  <namespaceManifests/>
+</flexLibProperties>
