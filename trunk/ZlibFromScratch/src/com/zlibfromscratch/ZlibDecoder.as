@@ -47,11 +47,11 @@ package com.zlibfromscratch
 	 *         messages to be concatenated without size information.
 	 *         By contrast, <code>ByteArray.uncompress()</code> would discard
 	 *         any data beyond the first message.</li>
-	 *     <li>Supports gzip format directly even when targetting Flash 9.
+	 *     <li>Gzip format is supported directly even when targeting Flash 9.
 	 *         By contrast, <code>ByteArray.uncompress()</code> requires
 	 *         Flash 10 or AIR, and further requires that the caller first
 	 *         parse and remove the gzip metadata.</li>
-	 *     <li>Automatically detects the compression format.</li>
+	 *     <li>The compression format is automatically detected.</li>
 	 *   </ol>
 	 * </p>
 	 * 
