@@ -5,6 +5,14 @@ A decompression library which supports zlib and gzip formats, written from scrat
 
 -----
 
+# NOTE: Now archived.
+
+This project is very, very old.  I stopped working with ActionScript in ~2011 if I remember correctly.  It was transferred from Google Code to GitHub, but there has been no reason to maintain it and no interest from anyone, ever, since it was published.  I haven't even used it myself in many, many years.
+
+So, now it's archived.  Enjoy, historians and code archaeologists!
+
+-----
+
 Advantages over `ByteArray.uncompress()`:
 
   * Compressed data does not need to be present all at once. It can be fed in a little at a time as it becomes available, for example, from a `Socket`. By contrast, `ByteArray.uncompress()` would throw an error if the data were incomplete.
